@@ -6,9 +6,11 @@ import datetime
 import json
 import os
 import pathlib
+import time
 from typing import Any, Callable, Literal
 
 import click
+from photoscript import Photo
 
 from osxphotos import PhotoInfo, PhotosDB, __version__
 from osxphotos.photo_signature import photo_signature
@@ -18,10 +20,11 @@ from osxphotos.photoquery import (
     QueryOptions,
     query_options_from_kwargs,
 )
-from osxphotos.photosalbum import PhotosAlbum
+from osxphotos.photosalbum import PhotosAlbum, PhotosAlbumPhotoScriptByPath
 from osxphotos.photosdb.photosdb_utils import get_db_version
 from osxphotos.phototemplate import PhotoTemplate, RenderOptions
 from osxphotos.platform import assert_macos
+from osxphotos.signature_utils import normalize_photo_signature_filename
 from osxphotos.sqlitekvstore import SQLiteKVStore
 from osxphotos.utils import pluralize
 
@@ -58,6 +61,8 @@ SYNC_IMPORT_TYPES = [
     "location",
 ]
 SYNC_IMPORT_TYPES_ALL = ["all"] + SYNC_IMPORT_TYPES
+
+OSXPHOTOS_SYNC_RETRY_ATTEMPTS = os.getenv("OSXPHOTOS_SYNC_RETRY_ATTEMPTS", 10)
 
 
 class SyncImportPath(click.ParamType):
@@ -151,6 +156,8 @@ def get_photo_metadata(photos: list[PhotoInfo]) -> str:
 
     # more than one photo with same fingerprint; merge metadata
     merge_fields = ["keywords", "persons", "albums", "title", "description", "uuid"]
+    # if any bool_fields field is True, value should be True
+    bool_fields = ["favorite"]
     photos_dict = {}
     for photo in photos:
         data = photo.asdict()
@@ -168,6 +175,8 @@ def get_photo_metadata(photos: list[PhotoInfo]) -> str:
                                 photos_dict[k] = v
                             elif photos_dict[k] and v != photos_dict[k]:
                                 photos_dict[k] = f"{photos_dict[k]} {v}"
+                elif k in bool_fields and v:
+                    photos_dict[k] = v
 
     # convert photos_dict to JSON string
     # wouldn't it be nice if json encoder handled datetimes...
@@ -272,15 +281,6 @@ def import_metadata(
         f"Importing metadata for [num]{len(photos)}[/] {photo_word} from [filepath]{import_path}[/]"
     )
 
-    # build mapping of key to photo
-    key_to_photo = {}
-    for photo in photos:
-        key = photo_signature(photo)
-        if key in key_to_photo:
-            key_to_photo[key].append(photo)
-        else:
-            key_to_photo[key] = [photo]
-
     # find keys in import_path that match keys in photos
     if import_type == "library":
         # create an in memory database of the import library
@@ -288,10 +288,10 @@ def import_metadata(
         photosdb = PhotosDB(import_path, verbose=verbose)
         # filter out shared photos which don't have a fingerprint and
         # whose metadata can't be set
-        photos = photosdb.query(QueryOptions(not_shared=True))
+        import_photos = photosdb.query(QueryOptions(not_shared=True))
         import_db = SQLiteKVStore(":memory:")
         verbose(f"Loading metadata from import library: [filepath]{import_path}[/]")
-        export_metadata_to_db(photos, import_db, progress=False)
+        export_metadata_to_db(import_photos, import_db, progress=False)
     elif import_type == "export":
         import_db = open_metadata_db(import_path)
     else:
@@ -300,26 +300,44 @@ def import_metadata(
         )
         raise click.Abort()
 
+    # build mapping of import key to photos
+    # if a photo's signature isn't in the import database, retry with any
+    # collision counter Photos appended to the filename removed,
+    # e.g. "IMG_1234 2.HEIC" -> "IMG_1234.HEIC"
+    key_to_photo = {}
+    unmatched_photos = []
+    for photo in photos:
+        key = photo_signature(photo)
+        if key not in import_db and not photo.shared:
+            # shared photo signatures don't contain a filename so only
+            # non-shared photos can use the filename fallback
+            key = normalize_photo_signature_filename(key, photo.original_filename)
+        if key not in import_db:
+            unmatched_photos.append(photo)
+            continue
+        if key in key_to_photo:
+            key_to_photo[key].append(photo)
+        else:
+            key_to_photo[key] = [photo]
+
     results = SyncResults()
     for key, key_photos in key_to_photo.items():
-        if key in import_db:
-            # import metadata from import_db
-            for photo in key_photos:
-                verbose(
-                    f"Importing metadata for [filename]{photo.original_filename}[/] ([uuid]{photo.uuid}[/])"
-                )
-                metadata = import_db[key]
-                results += import_metadata_for_photo(
-                    photo, metadata, set_, merge, dry_run, verbose
-                )
-        elif unmatched:
-            # unable to find metadata for photo in import_db
-            for photo in key_photos:
-                echo(
-                    f"Unable to find metadata for [filename]{photo.original_filename}[/] ([uuid]{photo.uuid}[/]) in [filepath]{import_path}[/]"
-                )
+        # import metadata from import_db
+        metadata = import_db[key]
+        for photo in key_photos:
+            verbose(
+                f"Importing metadata for [filename]{photo.original_filename}[/] ([uuid]{photo.uuid}[/])"
+            )
+            results += import_metadata_for_photo(
+                photo, metadata, set_, merge, dry_run, verbose
+            )
 
     if unmatched:
+        # report any photos for which no metadata was found in import_db
+        for photo in unmatched_photos:
+            echo(
+                f"Unable to find metadata for [filename]{photo.original_filename}[/] ([uuid]{photo.uuid}[/]) in [filepath]{import_path}[/]"
+            )
         # find any keys in import_db that don't match keys in photos
         for key in import_db.keys():
             if key not in key_to_photo:
@@ -468,11 +486,13 @@ def _update_albums_for_photo(
     """Add photo to new albums if necessary"""
     # add photo to any new albums but do not remove from existing albums
     results = SyncResults()
+
     value = sorted(metadata["albums"])
     before = sorted(photo.albums)
     albums_to_add = set(value) - set(before)
+
     if not albums_to_add:
-        verbose(f"\tNothing to do for albums", level=2)
+        verbose("\tNothing to do for albums", level=2)
         results.add_result(
             photo.uuid,
             photo.original_filename,
@@ -484,12 +504,40 @@ def _update_albums_for_photo(
         )
         return results
 
+    # Convert PhotoInfo object to Photo object to use PhotosAlbumPhotoScriptByPath
+    # And create Folder path for the Sync'ed Photo
+    photoscript_photo = None
+    try:
+        photoscript_photo = Photo(photo.uuid)
+    # TODO #1978 Should we re-raise an exception or simply return?
+    # TODO with the if photoscript_photo we should be covered.
+    except Exception as e:
+        echo_error(
+            f"Error getting photoscript object for {photo.original_filename} ({photo.uuid}): {e}"
+        )
+
     for album in albums_to_add:
-        verbose(f"\tAdding to album [filepath]{album}[/]")
-        if not dry_run:
-            PhotosAlbum(album, verbose=lambda x: verbose(f"\t{x}"), rich=True).add(
-                photo
+        album_path = metadata.get("folders", {}).get(
+            album, []
+        )  # list of folders (may be empty)
+        album_path.append(
+            album
+        )  # Add the album itself to pass on to PhotosAlbumPhotoScriptByPath
+
+        folder_path = (
+            "/".join(album_path[:-1]) if album_path else ""
+        )  # path of containing folders
+        folder_path = (
+            f" in folder path: [filepath]{folder_path}[/]" if folder_path else ""
+        )
+        verbose(f"\tAdding to album [filepath]{album}[/]{folder_path}")
+
+        if photoscript_photo is not None and not dry_run:
+            photos_album = PhotosAlbumPhotoScriptByPath(
+                album_path, verbose=verbose, rich=True
             )
+            photos_album.add(photoscript_photo)
+
     results.add_result(
         photo.uuid,
         photo.original_filename,
@@ -629,21 +677,35 @@ def set_photo_property(photo: photoscript.Photo, property: str, value: Any):
     if property == "keywords" and not isinstance(value, list):
         raise ValueError(f"keywords must be a list, not {type(value)}")
     elif property in {"title", "description"} and not isinstance(value, str):
-        raise ValueError(f"{property} must be a str, not {type(value)}")
+        # If the value is missing or is not a string, setting it to an empty string, will result in an error.
+        # So we can ignore this property if the value is None or not a string.
+        echo_error(
+            f"[warning] The property '{property}' of '{photo.original_filename}' is missing or invalid."
+        )
+        return
     elif property == "favorite":
         value = bool(value)
     elif property == "location":
         value = (value[0], value[1])
     elif property not in {"title", "description", "favorite", "keywords"}:
         raise ValueError(f"Unknown property: {property}")
-    setattr(photo, property, value)
+
+    # sometimes AppleScript fails to set the value so try until it does our OSXPHOTOS_SYNC_RETRY_ATTEMPTS
+    attempts = 0
+    while (
+        getattr(photo, property) != value and attempts < OSXPHOTOS_SYNC_RETRY_ATTEMPTS
+    ):
+        if attempts > 0:
+            time.sleep(0.25)
+        setattr(photo, property, value)
+        attempts += 1
 
 
 def print_import_summary(results: SyncResults):
     """Print summary of import results"""
     summary = results.results_summary()
     property_summary = ", ".join(
-        f"updated {property}: [num]{summary.get(property,0)}[/]"
+        f"updated {property}: [num]{summary.get(property, 0)}[/]"
         for property in SYNC_PROPERTIES
     )
     echo(
@@ -657,19 +719,15 @@ def print_import_summary(results: SyncResults):
     "-e",
     "export_path",
     metavar="EXPORT_FILE",
-    help="Export metadata to file EXPORT_FILE for later use with --import. "
-    "The export file will be a SQLite database; it is recommended to use the "
-    ".db extension though this is not required.",
+    help="Export metadata to file EXPORT_FILE for later use with --import. The export file will be a SQLite database; it is recommended to use the .db extension though this is not required.",
     type=click.Path(dir_okay=False, writable=True),
 )
 @click.option(
     "--import",
-    "-i",
+    "-I",
     "import_path",
     metavar="IMPORT_PATH",
-    help="Import metadata from file IMPORT_PATH. "
-    "IMPORT_PATH can a Photos library, a Photos database, or a metadata export file "
-    "created with --export.",
+    help="Import metadata from file IMPORT_PATH. IMPORT_PATH can a Photos library, a Photos database, or a metadata export file created with --export.",
     type=SyncImportPath(),
 )
 @click.option(
@@ -717,9 +775,7 @@ def print_import_summary(results: SyncResults):
     "--unmatched",
     "-U",
     is_flag=True,
-    help="When used with --import, print out a list of photos in the import source that "
-    "were not matched against the local library. Also prints out a list of photos "
-    "in the local library that were not matched against the import source. ",
+    help="When used with --import, print out a list of photos in the import source that were not matched against the local library. Also prints out a list of photos in the local library that were not matched against the import source. ",
 )
 @click.option(
     "--report",
@@ -738,13 +794,12 @@ def print_import_summary(results: SyncResults):
     "--append",
     "-A",
     is_flag=True,
-    help="If used with --report, add data to existing report file instead of overwriting it. "
-    "See also --report.",
+    help="If used with --report, add data to existing report file instead of overwriting it. See also --report.",
 )
 @click.option(
     "--dry-run",
     is_flag=True,
-    help="Dry run; " "when used with --import, don't actually update metadata.",
+    help="Dry run; when used with --import, don't actually update metadata.",
 )
 @VERBOSE_OPTION
 @TIMESTAMP_OPTION
@@ -820,6 +875,14 @@ def sync(
 
     osxphotos sync --export /path/to/export/folder/computer2.db --merge all --import /path/to/export/folder/computer1.db
 
+    Note: The sync command uses a heuristic to attempt to match photos and videos
+    between the two databases being synced but this has some limitations.
+    If there are duplicate photos in the library (exact copies), metadata will be merged
+    as the sync process will not be able to distinguish between the two copies upon import.
+    Additionally, if you have duplicated a photo then edited one of the duplicates, these
+    will appear to be the same asset and metadata will be merged. This is a limitation of
+    the current design. When merging metadata, keywords, title, captions/description, and albums
+    are merged and if one of the duplicates is marked as favorite, favorite status is set.
     """
 
     verbose = verbose_print(verbose=verbose_flag, timestamp=timestamp, theme=theme)
@@ -845,8 +908,7 @@ def sync(
         merge = set(merge)
         if set_ & merge:
             echo_error(
-                "--set and --merge cannot be used with the same fields: "
-                f"set: {set_}, merge: {merge}"
+                f"--set and --merge cannot be used with the same fields: set: {set_}, merge: {merge}"
             )
             ctx.exit(1)
 

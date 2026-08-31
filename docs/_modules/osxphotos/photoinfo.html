@@ -1,23 +1,23 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>osxphotos.photoinfo - osxphotos 0.72.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+        <title>osxphotos.photoinfo - osxphotos 0.76.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
@@ -144,14 +144,10 @@
   </symbol>
 </svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
 <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
@@ -161,17 +157,15 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">osxphotos 0.72.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">osxphotos 0.76.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
           <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
           <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -179,8 +173,7 @@
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
   </header>
@@ -189,8 +182,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  
-  <span class="sidebar-brand-text">osxphotos 0.72.2 documentation</span>
+  <span class="sidebar-brand-text">osxphotos 0.76.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -226,8 +218,7 @@
         </a>
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -235,8 +226,7 @@
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
@@ -248,6 +238,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -301,6 +292,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.exifinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExifInfo</span><span class="p">,</span> <span class="n">exifinfo_factory</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.exiftool</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExifToolCaching</span><span class="p">,</span> <span class="n">get_exiftool_path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.exportoptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExportOptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.media_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_caption</span><span class="p">,</span> <span class="n">get_media_analysis_results</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.momentinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">MomentInfo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.personinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaceInfo</span><span class="p">,</span> <span class="n">PersonInfo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.photoexporter</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhotoExporter</span>
@@ -314,7 +306,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.shareinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShareInfo</span><span class="p">,</span> <span class="n">get_moment_share_info</span><span class="p">,</span> <span class="n">get_share_info</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.shareparticipant</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShareParticipant</span><span class="p">,</span> <span class="n">get_share_participants</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.uti</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_preferred_uti_extension</span><span class="p">,</span> <span class="n">get_uti_for_extension</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_resource_loc</span><span class="p">,</span> <span class="n">hexdigest</span><span class="p">,</span> <span class="n">list_directory</span><span class="p">,</span> <span class="n">path_exists</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_get_resource_loc</span><span class="p">,</span>
+    <span class="n">find_files_by_prefix</span><span class="p">,</span>
+    <span class="n">hexdigest</span><span class="p">,</span>
+    <span class="n">list_directory</span><span class="p">,</span>
+    <span class="n">path_exists</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="k">if</span> <span class="n">is_macos</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">osxmetadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">OSXMetaData</span>
@@ -340,6 +338,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="p">:</span> <span class="s2">&quot;osxphotos.PhotosDB&quot;</span> <span class="o">=</span> <span class="n">db</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">_verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_asdict_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_exiftool_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -916,6 +916,23 @@
             <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
 
+<div class="viewcode-block" id="PhotoInfo.imported_by">
+<a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.imported_by">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">imported_by</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns tuple of &#39;imported by&#39; display name and bundle ID; one or both may be None; Photos 7+ only, on earlier versions returns (None, None)</span>
+
+<span class="sd">        For example: (&#39;Photos&#39;, &#39;com.apple.Photos&#39;); (&#39;Camera&#39;, &#39;com.apple.camera&#39;); (&#39;Messages&#39;, &#39;com.apple.MobileSMS&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">_db_version</span> <span class="o">&lt;=</span> <span class="n">_PHOTOS_4_VERSION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;imported_by_display_name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;imported_by_bundle_id&quot;</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">project_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProjectInfo</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;list of ProjectInfo objects representing projects for the photo or None if no projects&quot;&quot;&quot;</span>
@@ -986,6 +1003,24 @@
         <span class="k">return</span> <span class="n">plist_file</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">original_adjustments_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns path to original adjustments file or None if file doesn&#39;t exist (for example, Portrait images contain an origial adjustments file)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">_db_version</span> <span class="o">&lt;=</span> <span class="n">_PHOTOS_4_VERSION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">library</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">_library_path</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># first char of uuid</span>
+        <span class="n">aae_file</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">library</span><span class="p">)</span>
+            <span class="o">/</span> <span class="s2">&quot;originals&quot;</span>
+            <span class="o">/</span> <span class="n">directory</span>
+            <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span><span class="si">}</span><span class="s2">_5.aae&quot;</span>  <span class="c1"># There may be other AAE files but the _5 variant is all I&#39;ve seen</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">aae_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">aae_file</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">adjustments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdjustmentsInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns AdjustmentsInfo class for adjustment data or None if no adjustments; Photos 5+ only&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -996,6 +1031,21 @@
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_adjustmentinfo</span> <span class="o">=</span> <span class="n">AdjustmentsInfo</span><span class="p">(</span><span class="n">plist_file</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjustmentinfo</span>
+
+<div class="viewcode-block" id="PhotoInfo.original_adjustments">
+<a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.original_adjustments">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">original_adjustments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdjustmentsInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns AdjustmentsInfo class for original adjustment data or None if no adjustments; Photos 5+ only&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_adjustments_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdjustmentsInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_adjustments_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjustment_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns adjustment type as int or None if no adjustments&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasAdjustments&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">external_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1184,17 +1234,44 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">burst_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if photo is a burst photo and has been selected from the burst set by the user, otherwise False&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">BURST_SELECTED</span><span class="p">)</span>
+        <span class="n">burst_pick_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">burst_pick_type</span> <span class="o">&amp;</span> <span class="n">BURST_SELECTED</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">burst_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if photo is a burst photo and is the key image for the burst set (the image that Photos shows on top of the burst stack), otherwise False&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">BURST_KEY</span><span class="p">)</span>
+        <span class="n">burst_pick_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">burst_pick_type</span> <span class="o">&amp;</span> <span class="n">BURST_KEY</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">burst_key_photo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PhotoInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If a photo is part of a burst group, returns the PhotoInfo object for the key photo of a burst group otherwise None&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst_key</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">for</span> <span class="n">photo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst_photos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">burst_key</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">photo</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">burst_default_pick</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if photo is a burst image and is the photo that Photos selected as the default image for the burst set, otherwise False&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">BURST_DEFAULT_PICK</span><span class="p">)</span>
+        <span class="n">burst_pick_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;burstPickType&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">burst_pick_type</span> <span class="o">&amp;</span> <span class="n">BURST_DEFAULT_PICK</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">burst_photos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PhotoInfo</span><span class="p">]:</span>
@@ -1378,20 +1455,25 @@
         <span class="n">thumb_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">_library_path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">thumb_path</span><span class="p">)</span>
 
         <span class="c1"># find all files that start with uuid in derivative path</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">derivative_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">*.*&quot;</span><span class="p">))</span>
+        <span class="c1"># skip .THM files (these are actually low-res thumbnails in JPEG format but with .THM extension)</span>
+        <span class="k">if</span> <span class="n">derivative_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">derivatives</span> <span class="o">=</span> <span class="n">find_files_by_prefix</span><span class="p">(</span>
+                <span class="n">derivative_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">ignore_ext</span><span class="o">=</span><span class="s2">&quot;.THM&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">derivatives</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># previews may be missing from derivatives path</span>
         <span class="c1"># there are what appear to be low res thumbnails in the &quot;masters&quot; subfolder</span>
         <span class="k">if</span> <span class="n">path_exists</span><span class="p">(</span><span class="n">thumb_path</span><span class="p">):</span>
-            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thumb_path</span><span class="p">)</span>
+            <span class="n">derivatives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">thumb_path</span><span class="p">))</span>
 
-        <span class="c1"># sort by file size, largest first</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
-
-        <span class="c1"># return list of filename but skip .THM files (these are actually low-res thumbnails in JPEG format but with .THM extension)</span>
-        <span class="n">derivatives</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.THM&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isphoto</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">derivatives</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">derivatives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mov&quot;</span><span class="p">):</span>
-            <span class="c1"># ensure .mov is first in list as poster image could be larger than the movie preview</span>
+        <span class="c1"># ensure .mov is first in list as poster image could be larger than the movie preview</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isphoto</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">derivatives</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">derivatives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mov&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">derivatives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.MOV&quot;</span><span class="p">))</span>
+        <span class="p">):</span>
             <span class="n">derivatives</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">derivatives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">derivatives</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">derivatives</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">derivatives</span></div>
@@ -1510,7 +1592,7 @@
                     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="c1"># sometimes the reverse geolocation data is corrupted</span>
                         <span class="c1"># and this can cause a UnsupportedArchiver error</span>
-                        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;Error creating PlaceInfo5 for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_place</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1593,7 +1675,7 @@
                     <span class="n">duplicates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="o">.</span><span class="n">get_photo</span><span class="p">(</span><span class="n">uuid</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="c1"># don&#39;t expect this to happen as the signature should be in db</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Did not find signature for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2"> in _db_signatures&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Did not find signature for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2"> in _db_signatures&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">duplicates</span>
 
     <span class="nd">@property</span>
@@ -1908,7 +1990,7 @@
             <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
                 <span class="c1"># get_exiftool_path raises FileNotFoundError if exiftool not found</span>
                 <span class="n">exiftool</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;exiftool not in path; download and install from https://exiftool.org/&quot;</span>
                 <span class="p">)</span>
 
@@ -1974,6 +2056,22 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s2">&quot;masterFingerprint&quot;</span><span class="p">]</span></div>
 
 
+<div class="viewcode-block" id="PhotoInfo.media_analysis">
+<a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.media_analysis">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">media_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns media analysis results as a dictionary (Photos 5+)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">get_media_analysis_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PhotoInfo.ai_caption">
+<a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.ai_caption">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ai_caption</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns AI generated caption for photo or video (Photos 5+)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">get_caption</span><span class="p">(</span><span class="n">get_media_analysis_results</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span></div>
+
+
 <div class="viewcode-block" id="PhotoInfo.detected_text">
 <a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.detected_text">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">detected_text</span><span class="p">(</span>
@@ -1998,7 +2096,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">detected_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detected_text</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error detecting text in photo </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error detecting text in photo </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">detected_text</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_detected_text_cache</span><span class="p">[</span><span class="n">confidence_threshold</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -2313,6 +2411,13 @@
 <span class="sd">        Note:</span>
 <span class="sd">            The shallow representation is used internally by export as it contains only the subset of data needed for export.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">shallow</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict_cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_asdict_cache</span><span class="p">[</span><span class="n">shallow</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict_uncached</span><span class="p">(</span><span class="n">shallow</span><span class="o">=</span><span class="n">shallow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_asdict_cache</span><span class="p">[</span><span class="n">shallow</span><span class="p">])</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_asdict_uncached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shallow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return uncached dict representation of PhotoInfo object.&quot;&quot;&quot;</span>
 
         <span class="n">comments</span> <span class="o">=</span> <span class="p">[</span><span class="n">comment</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span> <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comments</span><span class="p">]</span>
         <span class="n">exif_info</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exif_info</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exif_info</span> <span class="k">else</span> <span class="p">{}</span>
@@ -2407,6 +2512,7 @@
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;adjustments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">adjustments</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustments</span> <span class="k">else</span> <span class="p">{}</span>
             <span class="p">)</span>
+            <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;adjustment_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_type</span>
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;burst_album_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst_album_info</span><span class="p">]</span>
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;burst_albums&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst_albums</span>
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;burst_default_pick&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">burst_default_pick</span>
@@ -2436,9 +2542,14 @@
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;screen_recording&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_recording</span>
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;date_original&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_original</span>
             <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;tzname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tzname</span>
+            <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;media_analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">media_analysis</span>
+            <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;ai_caption&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ai_caption</span>
+            <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;original_adjustments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">original_adjustments</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_adjustments</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="p">)</span>
+            <span class="n">dict_data</span><span class="p">[</span><span class="s2">&quot;imported_by&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imported_by</span>
 
-        <span class="k">return</span> <span class="n">dict_data</span></div>
-
+        <span class="k">return</span> <span class="n">dict_data</span>
 
 <div class="viewcode-block" id="PhotoInfo.json">
 <a class="viewcode-back" href="../../reference.html#osxphotos.PhotoInfo.json">[docs]</a>
@@ -2460,6 +2571,10 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
                 <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="n">shallow</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+
         <span class="n">dict_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">shallow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">shallow</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">shallow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -2469,7 +2584,11 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="n">dict_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">dict_data</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+            <span class="n">dict_data</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_data</span>
+        <span class="k">return</span> <span class="n">json_data</span></div>
 
 
 <div class="viewcode-block" id="PhotoInfo.tables">
@@ -2585,7 +2704,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">detected_text</span> <span class="o">=</span> <span class="n">frozen</span><span class="o">.</span><span class="n">_detected_text</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error detecting text in photo </span><span class="si">{</span><span class="n">frozen</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error detecting text in photo </span><span class="si">{</span><span class="n">frozen</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">detected_text</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="n">frozen</span><span class="o">.</span><span class="n">_detected_text_cache</span><span class="p">[</span><span class="n">confidence_threshold</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -2668,10 +2787,10 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=9cd837de"></script>
+</div><script src="../../_static/documentation_options.js?v=b7049291"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>

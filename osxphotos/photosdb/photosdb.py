@@ -19,6 +19,8 @@ from unicodedata import normalize
 
 from rich import print
 
+from osxphotos.platform import check_and_warn_macos_version
+
 from .._constants import (
     _DB_TABLE_NAMES,
     _MOVIE_TYPE,
@@ -37,7 +39,6 @@ from .._constants import (
     _PHOTOS_5_PROJECT_ALBUM_KIND,
     _PHOTOS_5_ROOT_FOLDER_KIND,
     _PHOTOS_5_SHARED_ALBUM_KIND,
-    _TESTED_OS_VERSIONS,
     _UNKNOWN_PERSON,
     BURST_KEY,
     BURST_PICK_TYPE_NONE,
@@ -52,9 +53,9 @@ from ..personinfo import PersonInfo
 from ..photoinfo import PhotoInfo
 from ..photoquery import QueryOptions, photo_query
 from ..photos_datetime import photos_datetime, photos_datetime_local
-from ..platform import get_macos_version, is_macos
+from ..platform import is_macos
 from ..rich_utils import add_rich_markup_tag
-from ..sqlite_utils import sqlite_db_is_locked, sqlite_open_ro
+from ..sqlite_utils import sqlite_columns, sqlite_db_is_locked, sqlite_open_ro
 from ..unicode import normalize_unicode
 from ..utils import _check_file_exists, get_last_library_path, noop
 from .photosdb_utils import (
@@ -144,19 +145,7 @@ class PhotosDB:
         if dbfile and is_iphoto_library(dbfile):
             raise PhotosDBReadError(f"{dbfile} is an iPhoto library, not Photos")
 
-        # Check OS version
-        system = platform.system()
-        (ver, major, _) = get_macos_version() if is_macos else (None, None, None)
-        if system == "Darwin" and (
-            ((ver, major) not in _TESTED_OS_VERSIONS)
-            and (ver, None) not in _TESTED_OS_VERSIONS
-        ):
-            tested_versions = ", ".join(
-                f"{v}.{m}" for (v, m) in _TESTED_OS_VERSIONS if m is not None
-            )
-            logging.warning(
-                f"WARNING: This module has only been tested with macOS versions [{tested_versions}]: you have {system}, OS version: {ver}.{major}"
-            )
+        check_and_warn_macos_version()
 
         if verbose is None:
             verbose = noop
@@ -359,14 +348,18 @@ class PhotosDB:
 
         dbfile: pathlib.Path = pathlib.Path(dbfile)
         dbfile = dbfile.resolve().absolute()
-        self._dbfile = self._dbfile_actual = None
+        self._dbfile, self._dbfile_actual = None, None
+        photos_5 = False
         if dbfile.is_dir():
             # passed a directory, assume it's a photoslibrary
-            if (dbfile / "database" / "photos.db").exists():
-                self._dbfile = self._dbfile_actual = dbfile / "database" / "photos.db"
             if (dbfile / "database" / "Photos.sqlite").exists():
                 # Photos 5+ file
                 self._dbfile_actual = dbfile / "database" / "Photos.sqlite"
+                photos_5 = True
+            if (dbfile / "database" / "photos.db").exists():
+                self._db_file = dbfile / "database" / "photos.db"
+                if not photos_5:
+                    self._dbfile_actual = self._db_file
             if not self._dbfile_actual:
                 raise FileNotFoundError(
                     f"Could not find Photos database file in {dbfile}"
@@ -375,13 +368,23 @@ class PhotosDB:
             # passed a non-existent file
             raise FileNotFoundError(f"dbfile {dbfile} does not exist", dbfile)
         elif dbfile.name.lower() == "photos.db":
-            self._dbfile = self._dbfile_actual = dbfile
-            # check to see if Photos.sqlite exists
+            self._dbfile = dbfile
+            self._dbfile_actual = dbfile
+            # check to see if Photos.sqlite exists in same folder
             if (dbfile.parent / "Photos.sqlite").exists():
                 # Photos 5+ file
                 self._dbfile_actual = dbfile.parent / "Photos.sqlite"
         else:
-            self._dbfile = self._dbfile_actual = dbfile
+            # assume it was a Photos.sqlite file passed
+            self._dbfile_actual = dbfile
+            if (dbfile.parent / "photos.db").exists():
+                # photos.db should be in same folder as Photos.sqlite
+                self._dbfile = dbfile.parent / "photos.db"
+            else:
+                self._dbfile = dbfile
+
+        if not self._dbfile:
+            self._dbfile = self._dbfile_actual
 
         logger.debug(f"{self._dbfile=} {self._dbfile_actual=}")
 
@@ -394,8 +397,6 @@ class PhotosDB:
         # In either case, a temporary copy will be made if the DB is locked by Photos
         # or photosanalysisd
 
-        verbose(f"Processing database {self._filepath(self._dbfile)}")
-
         # if database is exclusively locked, make a copy of it and use the copy
         # Photos maintains an exclusive lock on the database file while Photos is open
         # photoanalysisd sometimes maintains this lock even after Photos is closed
@@ -404,18 +405,20 @@ class PhotosDB:
 
         # _db_version is set from photos.db
         if self._dbfile:
+            verbose(f"Processing database {self._filepath(self._dbfile)}")
             try:
                 if sqlite_db_is_locked(self._dbfile):
                     verbose("photos.db locked, creating temporary copy.")
                     self._tmp_db = self._copy_db_file(self._dbfile)
                 self._db_version = get_db_version(self._tmp_db)
             except Exception as e:
-                logging.warning(
+                logger.warning(
                     f"Error getting database version from {self._dbfile}: {e}"
                 )
-                self._db_version = "5000"  # assume version 5000 and hope for the best
+                self._db_version = "6000"  # assume Photos 5+ and hope for the best
         else:
-            self._db_version = "5000"  # assume version 5000 and hope for the best
+            logger.debug(f"{self._dbfile=}, setting _db_version to 6000")
+            self._db_version = "6000"
 
         # _photos_version is set from Photos.sqlite which only exists for Photos 5+
         db_ver_int = int(self._db_version)
@@ -689,17 +692,17 @@ class PhotosDB:
 
     @property
     def db_version(self):
-        """Return the database version as stored in LiGlobals table"""
+        """Return the Photos database version"""
         return self._db_version
 
     @property
     def db_path(self):
-        """Returns path to the Photos library database PhotosDB was initialized with"""
-        return os.path.abspath(self._dbfile)
+        """Returns path to the Photos library database"""
+        return os.path.abspath(self._dbfile_actual)
 
     @property
     def library_path(self):
-        """Returns path to the Photos library PhotosDB was initialized with"""
+        """Returns path to the Photos library"""
         return self._library_path
 
     @property
@@ -731,9 +734,8 @@ class PhotosDB:
                 FileUtil.copy(f"{fname}-wal", f"{dest_path}-wal")
             if os.path.exists(f"{fname}-shm"):
                 FileUtil.copy(f"{fname}-shm", f"{dest_path}-shm")
-        except:
-            print(f"Error copying{fname} to {dest_path}", file=sys.stderr)
-            raise Exception
+        except Exception as e:
+            raise IOError(f"Error copying{fname} to {dest_path}") from e
 
         logger.debug(dest_path)
 
@@ -1049,7 +1051,8 @@ class PhotosDB:
                     RKVersion.showInLibrary,
                     RKMaster.fileIsReference,
                     RKMaster.importGroupUuid,
-                    RKMaster.fingerprint
+                    RKMaster.fingerprint,
+                    RKVersion.imageTimeZoneName
                     FROM RKVersion, RKMaster
                     WHERE RKVersion.masterUuid = RKMaster.uuid"""
             )
@@ -1082,7 +1085,8 @@ class PhotosDB:
                     RKVersion.showInLibrary,
                     RKMaster.fileIsReference,
                     RKMaster.importGroupUuid,
-                    RKMaster.fingerprint
+                    RKMaster.fingerprint,
+                    RKVersion.imageTimeZoneName
                     FROM RKVersion, RKMaster
                     WHERE RKVersion.masterUuid = RKMaster.uuid"""
             )
@@ -1134,6 +1138,7 @@ class PhotosDB:
         # 43    RKMaster.fileIsReference -- file is reference (imported without copying to Photos library)
         # 44    RKMaster.importGroupUuid -- to get date added from RKImportGroup
         # 45    RKMaster.fingerprint -- fingerprint / hash of the file
+        # 46    RKVersion.imageTimeZoneName -- time zone name of the image
 
         for row in c:
             uuid = row[0]
@@ -1150,12 +1155,13 @@ class PhotosDB:
             self._dbphotos[uuid]["lastmodifieddate"] = photos_datetime_local(row[4])
 
             self._dbphotos[uuid]["imageTimeZoneOffsetSeconds"] = row[9]
-            self._dbphotos[uuid]["imageTimeZoneName"] = None  # Photos 5+
+            self._dbphotos[uuid]["imageTimeZoneName"] = row[46]
             self._dbphotos[uuid]["imageDate_timestamp"] = row[5]
 
             self._dbphotos[uuid]["imageDate"] = photos_datetime(
                 row[5],
                 self._dbphotos[uuid]["imageTimeZoneOffsetSeconds"] or 0,
+                self._dbphotos[uuid]["imageTimeZoneName"] or None,
                 default=True,
             )
 
@@ -1241,6 +1247,9 @@ class PhotosDB:
             # screen-recording (not available <= _PHOTOS_4_VERSION)
             self._dbphotos[uuid]["screen_recording"] = None
             self._dbphotos[uuid]["portrait"] = True if row[25] == 9 else False
+
+            # spatial (Apple Vision Pro) photos not available <= _PHOTOS_4_VERSION
+            self._dbphotos[uuid]["spatial"] = 0
 
             # selfies (front facing camera, RKVersion.selfPortrait == 1)
             if row[27] is not None:
@@ -1566,7 +1575,7 @@ class PhotosDB:
             self._dbphotos[uuid]["placeIDs"] = place_ids
             country_code = [countries[x] for x in place_ids if x in countries]
             if len(country_code) > 1:
-                logging.warning(f"Found more than one country code for uuid: {uuid}")
+                logger.warning(f"Found more than one country code for uuid: {uuid}")
 
             if country_code:
                 self._dbphotos[uuid]["countryCode"] = country_code[0]
@@ -1744,6 +1753,16 @@ class PhotosDB:
         hdr_type_column = _DB_TABLE_NAMES[photos_ver]["HDR_TYPE"]
         master_fingerprint = _DB_TABLE_NAMES[photos_ver]["MASTER_FINGERPRINT"]
         has_adjustments = _DB_TABLE_NAMES[photos_ver]["HAS_ADJUSTMENTS"]
+
+        # ZASSET.ZSPATIALTYPE identifies Apple spatial media (Apple Vision Pro).
+        # The column only exists in newer Photos versions (Photos 9+ / macOS 14+)
+        # and is not present in every library at the same schema version, so
+        # check for it directly rather than relying on the version alone.
+        spatial_type = (
+            f"{asset_table}.ZSPATIALTYPE"
+            if "ZSPATIALTYPE" in sqlite_columns(conn, asset_table)
+            else "null"
+        )
 
         # Look for all combinations of persons and pictures
         logger.debug(f"Getting information about persons")
@@ -1934,6 +1953,12 @@ class PhotosDB:
             # in Photos >= 5, folders are special albums
             self._dbalbums_pk[album[8]] = album[0]
 
+        if self.photos_version > 11:
+            try:
+                self._process_shared_albums()
+            except Exception as e:
+                logging.debug(f"Error processing shared albums: {e}")
+
         # get pk of root folder
         root_uuid = [
             album
@@ -1999,56 +2024,76 @@ class PhotosDB:
 
         # get details about photos
         verbose("Processing photo details.")
-        c.execute(
-            f"""SELECT {asset_table}.ZUUID,
-                {master_fingerprint},
-                ZADDITIONALASSETATTRIBUTES.ZTITLE,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALFILENAME,
-                {asset_table}.ZMODIFICATIONDATE,
-                {asset_table}.ZDATECREATED,
-                ZADDITIONALASSETATTRIBUTES.ZTIMEZONEOFFSET,
-                ZADDITIONALASSETATTRIBUTES.ZINFERREDTIMEZONEOFFSET,
-                ZADDITIONALASSETATTRIBUTES.ZTIMEZONENAME,
-                {asset_table}.ZHIDDEN,
-                {asset_table}.ZFAVORITE,
-                {asset_table}.ZDIRECTORY,
-                {asset_table}.ZFILENAME,
-                {asset_table}.ZLATITUDE,
-                {asset_table}.ZLONGITUDE,
-                {has_adjustments},
-                {asset_table}.ZCLOUDBATCHPUBLISHDATE,
-                {asset_table}.ZKIND,
-                {asset_table}.ZUNIFORMTYPEIDENTIFIER,
-                {asset_table}.ZAVALANCHEUUID,
-                {asset_table}.ZAVALANCHEPICKTYPE,
-                {asset_table}.ZKINDSUBTYPE,
-                {asset_table}.{hdr_type_column},
-                ZADDITIONALASSETATTRIBUTES.ZCAMERACAPTUREDEVICE,
-                {asset_table}.ZCLOUDASSETGUID,
-                ZADDITIONALASSETATTRIBUTES.ZREVERSELOCATIONDATA,
-                {asset_table}.ZMOMENT,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALRESOURCECHOICE,
-                {asset_table}.ZTRASHEDSTATE,
-                {asset_table}.ZHEIGHT,
-                {asset_table}.ZWIDTH,
-                {asset_table}.ZORIENTATION,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALHEIGHT,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALWIDTH,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALORIENTATION,
-                ZADDITIONALASSETATTRIBUTES.ZORIGINALFILESIZE,
-                {depth_state},
-                {asset_table}.ZADJUSTMENTTIMESTAMP,
-                {asset_table}.ZVISIBILITYSTATE,
-                {asset_table}.ZTRASHEDDATE,
-                {asset_table}.ZSAVEDASSETTYPE,
-                {asset_table}.ZADDEDDATE,
-                {asset_table}.Z_PK,
-                {asset_table}.ZCLOUDOWNERHASHEDPERSONID,
-                {asset_table}.ZMOMENTSHARE
-                FROM {asset_table}
-                JOIN ZADDITIONALASSETATTRIBUTES ON ZADDITIONALASSETATTRIBUTES.ZASSET = {asset_table}.Z_PK
-                ORDER BY {asset_table}.ZUUID  """
-        )
+        sql = f"""SELECT {asset_table}.ZUUID,
+            {master_fingerprint},
+            ZADDITIONALASSETATTRIBUTES.ZTITLE,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALFILENAME,
+            {asset_table}.ZMODIFICATIONDATE,
+            {asset_table}.ZDATECREATED,
+            ZADDITIONALASSETATTRIBUTES.ZTIMEZONEOFFSET,
+            ZADDITIONALASSETATTRIBUTES.ZINFERREDTIMEZONEOFFSET,
+            ZADDITIONALASSETATTRIBUTES.ZTIMEZONENAME,
+            {asset_table}.ZHIDDEN,
+            {asset_table}.ZFAVORITE,
+            {asset_table}.ZDIRECTORY,
+            {asset_table}.ZFILENAME,
+            {asset_table}.ZLATITUDE,
+            {asset_table}.ZLONGITUDE,
+            {has_adjustments},
+            {asset_table}.ZCLOUDBATCHPUBLISHDATE,
+            {asset_table}.ZKIND,
+            {asset_table}.ZUNIFORMTYPEIDENTIFIER,
+            {asset_table}.ZAVALANCHEUUID,
+            {asset_table}.ZAVALANCHEPICKTYPE,
+            {asset_table}.ZKINDSUBTYPE,
+            {asset_table}.{hdr_type_column},
+            ZADDITIONALASSETATTRIBUTES.ZCAMERACAPTUREDEVICE,
+            {asset_table}.ZCLOUDASSETGUID,
+            ZADDITIONALASSETATTRIBUTES.ZREVERSELOCATIONDATA,
+            {asset_table}.ZMOMENT,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALRESOURCECHOICE,
+            {asset_table}.ZTRASHEDSTATE,
+            {asset_table}.ZHEIGHT,
+            {asset_table}.ZWIDTH,
+            {asset_table}.ZORIENTATION,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALHEIGHT,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALWIDTH,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALORIENTATION,
+            ZADDITIONALASSETATTRIBUTES.ZORIGINALFILESIZE,
+            {depth_state},
+            {asset_table}.ZADJUSTMENTTIMESTAMP,
+            {asset_table}.ZVISIBILITYSTATE,
+            {asset_table}.ZTRASHEDDATE,
+            {asset_table}.ZSAVEDASSETTYPE,
+            {asset_table}.ZADDEDDATE,
+            {asset_table}.Z_PK,
+            {asset_table}.ZCLOUDOWNERHASHEDPERSONID,
+            {asset_table}.ZMOMENTSHARE,
+         """
+
+        if self.photos_version >= 7:
+            # ZIMPORTEDBY... only valid on Photos 7+
+            sql += """
+                ZADDITIONALASSETATTRIBUTES.ZIMPORTEDBYDISPLAYNAME,
+                ZADDITIONALASSETATTRIBUTES.ZIMPORTEDBYBUNDLEIDENTIFIER
+            """
+        else:
+            sql += """
+                null,
+                null
+            """
+
+        sql += f""",
+            {spatial_type}
+        """
+
+        sql += f"""
+            FROM {asset_table}
+            JOIN ZADDITIONALASSETATTRIBUTES ON ZADDITIONALASSETATTRIBUTES.ZASSET = {asset_table}.Z_PK
+            ORDER BY {asset_table}.ZUUID
+            """
+
+        c.execute(sql)
         # Order of results
         # 0    SELECT ZGENERICASSET.ZUUID,
         # 1    ZADDITIONALASSETATTRIBUTES.ZMASTERFINGERPRINT,
@@ -2096,6 +2141,9 @@ class PhotosDB:
         # 42   ZGENERICASSET.Z_PK -- primary key
         # 43   ZGENERICASSET.ZCLOUDOWNERHASHEDPERSONID -- used to look up owner name (for shared photos)
         # 44   ZASSET.ZMOMENTSHARE -- FK for ZSHARE (shared moments, Photos 5+; in Photos 7+ these are in the scopes/momentshared folder)
+        # 45   ZADDITIONALASSETATTRIBUTES.ZIMPORTEDBYDISPLAYNAME
+        # 46   ZADDITIONALASSETATTRIBUTES.ZIMPORTEDBYBUNDLEIDENTIFIER
+        # 47   ZASSET.ZSPATIALTYPE (or null if column not present) -- 0 = 2D, 1 = native spatial, 2 = converted spatial
 
         for row in c:
             uuid = row[0]
@@ -2206,6 +2254,10 @@ class PhotosDB:
             info["depth_state"] = row[36]
             info["portrait"] = True if row[36] != 0 else False
 
+            # spatial media type (Apple Vision Pro); 0 if not spatial or column not present
+            # 1 == native spatial capture, 2 == 2D photo converted to spatial
+            info["spatial"] = row[47] or 0
+
             # Set panorama from either KindSubType or RenderedValue
             info["panorama"] = True if row[21] == 1 or row[22] == 6 else False
 
@@ -2272,6 +2324,9 @@ class PhotosDB:
             info["cloudownerhashedpersonid"] = row[43]
 
             info["moment_share"] = row[44]
+
+            info["imported_by_display_name"] = row[45]
+            info["imported_by_bundle_id"] = row[46]
 
             # initialize import session info which will be filled in later
             # not every photo has an import session so initialize all records now
@@ -2730,6 +2785,84 @@ class PhotosDB:
 
             self._db_moment_pk[moment_info["pk"]] = moment_info
 
+    def _process_shared_albums(self):
+        """Process shared album info on macOS Tahoe and later"""
+        # get details about albums
+        _, c = self.get_db_connection()
+
+        asset_table = _DB_TABLE_NAMES[self.photos_version]["ASSET"]
+        album_share_table = "ZSHARE"
+        c.execute(
+            f""" SELECT
+                {album_share_table}.ZUUID,
+                {asset_table}.ZUUID
+                FROM {asset_table}
+                JOIN {album_share_table} ON {album_share_table}.Z_PK = {asset_table}.ZCOLLECTIONSHARE
+            """
+        )
+
+        # 0     ZGENERICALBUM.ZUUID,
+        # 1     ZGENERICASSET.ZUUID,
+        # 2     Z_26ASSETS.Z_FOK_34ASSETS
+
+        for album in c:
+            # store by uuid in _dbalbums_uuid and by album in _dbalbums_album
+            album_uuid = album[0]
+            photo_uuid = album[1]
+            # sort_order = album[2] # TODO: figure out album sort order
+            sort_order = 0
+            try:
+                self._dbalbums_uuid[photo_uuid].append(album_uuid)
+            except KeyError:
+                self._dbalbums_uuid[photo_uuid] = [album_uuid]
+
+            try:
+                self._dbalbums_album[album_uuid].append((photo_uuid, sort_order))
+            except KeyError:
+                self._dbalbums_album[album_uuid] = [(photo_uuid, sort_order)]
+
+        # now get additional details about albums
+        c.execute(
+            "SELECT "
+            "ZUUID, "  # 0
+            "ZTITLE, "  # 1
+            "ZCLOUDLOCALSTATE, "  # 2
+            "Z_PK, "  # 3
+            "ZTRASHEDSTATE, "  # 4
+            "ZCREATIONDATE, "  # 5
+            "ZSTARTDATE, "  # 6
+            "ZENDDATE, "  # 7
+            "ZCUSTOMSORTASCENDING, "  # 8
+            "ZCUSTOMSORTKEY "  # 9
+            "FROM ZSHARE "
+        )
+        for album in c:
+            self._dbalbum_details[album[0]] = {
+                "_uuid": album[0],
+                "title": normalize_unicode(album[1]),
+                "cloudlocalstate": album[2],
+                "cloudlibrarystate": None,  # Photos 4
+                "cloudidentifier": None,  # Photos 4
+                "cloudownerfirstname": None,
+                "cloudownderlastname": None,
+                "parentfolder": None,
+                "cloudownerhashedpersonid": "XXXUNKNOWNXXX",
+                "kind": _PHOTOS_5_SHARED_ALBUM_KIND,
+                "pk": album[3],
+                "intrash": False if album[4] == 0 else True,
+                "creation_date": album[5]
+                or 0,  # iPhone Photos.sqlite can have null value
+                "start_date": album[6] or 0,
+                "end_date": album[7] or 0,
+                "customsortascending": album[8],
+                "customsortkey": album[9],
+            }
+
+            # add cross-reference by pk to uuid
+            # needed to extract folder hierarchy
+            # in Photos >= 5, folders are special albums
+            self._dbalbums_pk[album[8]] = album[0]
+
     def _build_album_folder_hierarchy_5(self, uuid, folders=None):
         """Recursively build folder/album hierarchy
         uuid: uuid of the album/folder being processed
@@ -2846,11 +2979,9 @@ class PhotosDB:
         returns empty list of album is not in any folders"""
         # title = photosdb._dbalbum_details[album_uuid]["title"]
         folders = self._dbalbum_folders[album_uuid]
-        # logging.warning(f"uuid = {album_uuid}, folder = {folders}")
 
         def _recurse_folder_hierarchy(folders, hierarchy=[]):
             """Recursively walk the folders dict to build list of folder hierarchy"""
-            # logging.warning(f"folders={folders},hierarchy = {hierarchy}")
             if not folders:
                 # empty folder dict (album has no folder hierarchy)
                 return []
@@ -2871,7 +3002,6 @@ class PhotosDB:
             return hierarchy
 
         hierarchy = _recurse_folder_hierarchy(folders)
-        # logging.warning(f"hierarchy = {hierarchy}")
         return hierarchy
 
     def _album_folder_hierarchy_folderinfo_5(self, album_uuid):
@@ -2930,12 +3060,12 @@ class PhotosDB:
 
         if self._db_version <= _PHOTOS_4_VERSION:
             if shared:
-                logging.warning(
+                logger.warning(
                     f"Shared albums not implemented for Photos library version {self._db_version}"
                 )
                 return []  # not implemented for _PHOTOS_4_VERSION
             elif import_session:
-                logging.warning(
+                logger.warning(
                     f"Import sessions not implemented for Photos library version {self._db_version}"
                 )
                 return []  # not implemented for _PHOTOS_4_VERSION
@@ -3186,7 +3316,8 @@ class PhotosDB:
 
     def execute(self, sql: str, params: Any | None = None) -> sqlite3.Cursor:
         """Execute sql statement and return cursor"""
-        self._db_connection, _ = self.get_db_connection()
+        if not getattr(self, "_db_connection", None):
+            self._db_connection, _ = self.get_db_connection()
         params = params or ()
         return self._db_connection.cursor().execute(sql, params)
 
